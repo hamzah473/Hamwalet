@@ -2,88 +2,6 @@ package com.hamnetwork.wallet;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.graphics.Color;
-import android.view.Gravity;
-import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-public class MainActivity extends Activity {
-
-    TextView address;
-    TextView balance;
-    TextView status;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        LinearLayout layout = new LinearLayout(this);
-        layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setGravity(Gravity.CENTER);
-        layout.setPadding(40, 40, 40, 40);
-
-        TextView title = new TextView(this);
-        title.setText("HAM Wallet");
-        title.setTextSize(30);
-        title.setTextColor(Color.BLACK);
-        title.setGravity(Gravity.CENTER);
-
-        status = new TextView(this);
-        status.setText("Wallet HAM siap");
-        status.setTextSize(18);
-        status.setGravity(Gravity.CENTER);
-
-        address = new TextView(this);
-        address.setText("\nAlamat HAM:\nBelum dibuat");
-        address.setTextSize(16);
-        address.setGravity(Gravity.CENTER);
-
-        balance = new TextView(this);
-        balance.setText("\nSaldo HAM: 0 HAM");
-        balance.setTextSize(20);
-        balance.setGravity(Gravity.CENTER);
-
-        Button createWallet = new Button(this);
-        createWallet.setText("BUAT WALLET");
-
-        Button mining = new Button(this);
-        mining.setText("MULAI MINING");
-
-        createWallet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                address.setText(
-                    "\nAlamat HAM:\nHAM-WALLET-ANDROID"
-                );
-                status.setText("Wallet HAM berhasil dibuat");
-            }
-        });
-
-        mining.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                status.setText(
-                    "Mining HAM:\nBelum terhubung ke node"
-                );
-            }
-        });
-
-        layout.addView(title);
-        layout.addView(status);
-        layout.addView(address);
-        layout.addView(balance);
-        layout.addView(createWallet);
-        layout.addView(mining);
-
-        setContentView(layout);
-    }
-}
-package com.hamnetwork.wallet;
-
-import android.app.Activity;
-import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
 import android.view.View;
@@ -108,6 +26,7 @@ public class MainActivity extends Activity {
     private TextView balanceView;
     private TextView statusView;
     private TextView miningView;
+    private Button miningButton;
 
     private SharedPreferences prefs;
 
@@ -136,9 +55,11 @@ public class MainActivity extends Activity {
     }
 
     private void loadWallet() {
+
         privateKey = prefs.getString("private_key", null);
 
         if (privateKey == null) {
+
             privateKey = randomHex(32);
             publicKey = sha256(privateKey);
             address = "HAM1" + sha256(publicKey).substring(0, 40);
@@ -155,8 +76,14 @@ public class MainActivity extends Activity {
                     .putInt("block_index", blockIndex)
                     .putString("previous_hash", previousHash)
                     .apply();
+
         } else {
-            publicKey = prefs.getString("public_key", sha256(privateKey));
+
+            publicKey = prefs.getString(
+                    "public_key",
+                    sha256(privateKey)
+            );
+
             address = prefs.getString(
                     "address",
                     "HAM1" + sha256(publicKey).substring(0, 40)
@@ -171,6 +98,7 @@ public class MainActivity extends Activity {
     private void buildInterface() {
 
         LinearLayout layout = new LinearLayout(this);
+
         layout.setOrientation(LinearLayout.VERTICAL);
         layout.setGravity(Gravity.CENTER);
         layout.setPadding(30, 30, 30, 30);
@@ -192,36 +120,39 @@ public class MainActivity extends Activity {
         balanceView.setTextSize(22);
         balanceView.setGravity(Gravity.CENTER);
 
-        Button copy = new Button(this);
-        copy.setText("SALIN ALAMAT");
+        Button copyButton = new Button(this);
+        copyButton.setText("SALIN ALAMAT");
 
-        copy.setOnClickListener(new View.OnClickListener() {
+        copyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 ClipboardManager cm =
-                        (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                        (ClipboardManager)
+                        getSystemService(Context.CLIPBOARD_SERVICE);
 
                 cm.setPrimaryClip(
-                        ClipData.newPlainText("HAM Address", address)
+                        ClipData.newPlainText(
+                                "HAM Address",
+                                address
+                        )
                 );
 
                 statusView.setText("Alamat HAM disalin");
             }
         });
 
-        Button mining = new Button(this);
-        mining.setText("MULAI MINING");
+        miningButton = new Button(this);
+        miningButton.setText("MULAI MINING");
 
-        mining.setOnClickListener(new View.OnClickListener() {
+        miningButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 if (!mining) {
                     startMining();
-                    mining.setText("BERHENTI MINING");
                 } else {
                     stopMining();
-                    mining.setText("MULAI MINING");
                 }
             }
         });
@@ -234,8 +165,8 @@ public class MainActivity extends Activity {
         layout.addView(statusView);
         layout.addView(addressView);
         layout.addView(balanceView);
-        layout.addView(copy);
-        layout.addView(mining);
+        layout.addView(copyButton);
+        layout.addView(miningButton);
         layout.addView(miningView);
 
         setContentView(layout);
@@ -244,17 +175,26 @@ public class MainActivity extends Activity {
     private void updateScreen() {
 
         addressView.setText(
-                "\nAlamat HAM:\n" + address + "\n"
+                "\nAlamat HAM:\n" +
+                address +
+                "\n"
         );
 
         balanceView.setText(
-                "Saldo: " + balance + " HAM\n"
+                "Saldo: " +
+                balance +
+                " HAM\n"
         );
 
         if (mining) {
+
             statusView.setText("MINING HAM AKTIF");
+            miningButton.setText("BERHENTI MINING");
+
         } else {
+
             statusView.setText("Wallet HAM siap");
+            miningButton.setText("MULAI MINING");
         }
 
         miningView.setText(
@@ -293,7 +233,14 @@ public class MainActivity extends Activity {
             miningThread.interrupt();
         }
 
-        statusView.setText("Mining dihentikan");
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+
+                statusView.setText("Mining dihentikan");
+                miningButton.setText("MULAI MINING");
+            }
+        });
     }
 
     private void mineBlock() {
@@ -308,7 +255,8 @@ public class MainActivity extends Activity {
             prev = previousHash;
         }
 
-        long timestamp = System.currentTimeMillis() / 1000L;
+        long timestamp =
+                System.currentTimeMillis() / 1000L;
 
         String data =
                 "HAM mining reward " +
@@ -317,6 +265,8 @@ public class MainActivity extends Activity {
                 address;
 
         long nonce = 0;
+
+        String target = repeat("0", DIFFICULTY);
 
         while (mining) {
 
@@ -329,7 +279,7 @@ public class MainActivity extends Activity {
                     nonce
             );
 
-            if (hash.startsWith(repeat("0", DIFFICULTY))) {
+            if (hash.startsWith(target)) {
 
                 blockIndex = index;
                 previousHash = hash;
@@ -348,7 +298,9 @@ public class MainActivity extends Activity {
                     public void run() {
 
                         balanceView.setText(
-                                "Saldo: " + balance + " HAM\n"
+                                "Saldo: " +
+                                balance +
+                                " HAM\n"
                         );
 
                         statusView.setText(
@@ -356,8 +308,10 @@ public class MainActivity extends Activity {
                         );
 
                         miningView.setText(
-                                "Block: " + blockIndex +
-                                "\nReward: " + REWARD +
+                                "Block: " +
+                                blockIndex +
+                                "\nReward: " +
+                                REWARD +
                                 " HAM\n\nHash:\n" +
                                 resultHash
                         );
@@ -381,7 +335,13 @@ public class MainActivity extends Activity {
         StringBuilder result = new StringBuilder();
 
         for (byte b : data) {
-            result.append(String.format("%02x", b & 255));
+
+            result.append(
+                    String.format(
+                            "%02x",
+                            b & 255
+                    )
+            );
         }
 
         return result.toString();
@@ -396,27 +356,36 @@ public class MainActivity extends Activity {
 
             byte[] bytes =
                     md.digest(
-                            input.getBytes(StandardCharsets.UTF_8)
+                            input.getBytes(
+                                    StandardCharsets.UTF_8
+                            )
                     );
 
-            StringBuilder result = new StringBuilder();
+            StringBuilder result =
+                    new StringBuilder();
 
             for (byte b : bytes) {
+
                 result.append(
-                        String.format("%02x", b & 255)
+                        String.format(
+                                "%02x",
+                                b & 255
+                        )
                 );
             }
 
             return result.toString();
 
         } catch (Exception e) {
+
             throw new RuntimeException(e);
         }
     }
 
     private String repeat(String text, int count) {
 
-        StringBuilder result = new StringBuilder();
+        StringBuilder result =
+                new StringBuilder();
 
         for (int i = 0; i < count; i++) {
             result.append(text);
