@@ -1,0 +1,7 @@
+com.hamnetwork.wallet.app-pngs-0 /home/userland/HAMWallet/app/build/generated/res/pngs/debug
+com.hamnetwork.wallet.app-resValues-1 /home/userland/HAMWallet/app/build/generated/res/resValues/debug
+com.hamnetwork.wallet.app-packageDebugResources-2 /home/userland/HAMWallet/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.hamnetwork.wallet.app-packageDebugResources-3 /home/userland/HAMWallet/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.hamnetwork.wallet.app-debug-4 /home/userland/HAMWallet/app/build/intermediates/merged_res/debug/mergeDebugResources
+com.hamnetwork.wallet.app-debug-5 /home/userland/HAMWallet/app/src/debug/res
+com.hamnetwork.wallet.app-main-6 /home/userland/HAMWallet/app/src/main/res
